@@ -26,7 +26,7 @@ public class MinecraftController {
     @GetMapping("/players")
     public ResponseEntity players() {
         if(!minecraftService.isServerOnline()) {
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new APIResponse(false, "SERVER_OFFLINE", "Server is offline"));
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(new APIResponse(false, "SERVER_OFFLINE", "Le serveur Minecraft n'est pas en ligne"));
         }
         return ResponseEntity.status(HttpStatus.OK).body(new APIResponse(true, "ONLINE_PLAYERS", "" + minecraftService.getOnlinePlayersCount()));
     }

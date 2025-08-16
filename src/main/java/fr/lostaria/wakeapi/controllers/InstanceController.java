@@ -30,27 +30,27 @@ public class InstanceController {
     public ResponseEntity start() throws OvhApiException {
         InstanceStatus status = ovhApiService.getInstanceStatus();
         if(status.isStarting() || status.isStopping()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_ALREADY_STARTING_OR_STOPPING", "Instance is already starting or stopping"));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_ALREADY_STARTING_OR_STOPPING", "L'instance est déjà en cours de démarrage ou d'arrêt"));
         }
         if(status.isRunning()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_ALREADY_ACTIVE", "Instance is already active"));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_ALREADY_ACTIVE", "L'instance est déjà démarrée"));
         }
         ovhApiService.unshelveInstance();
         watchService.startWatchAfterOneHour();
-        return ResponseEntity.status(HttpStatus.OK).body(new APIResponse(true, "INSTANCE_STARTING", "Instance starting"));
+        return ResponseEntity.status(HttpStatus.OK).body(new APIResponse(true, "INSTANCE_STARTING", "Instance en cours de démarrage"));
     }
 
     @PostMapping("/stop")
     public ResponseEntity stop() throws OvhApiException, IOException {
         InstanceStatus status = ovhApiService.getInstanceStatus();
         if(status.isStarting() || status.isStopping()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_ALREADY_STARTING_OR_STOPPING", "Instance is already starting or stopping"));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_ALREADY_STARTING_OR_STOPPING", "L'instance est déjà en cours de démarrage ou d'arrêt"));
         }
         if(!status.isRunning()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_NOT_ACTIVE", "Instance is not active"));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_NOT_ACTIVE", "L'instance est déjà éteinte"));
         }
         ovhApiService.shelveInstance();
-        return ResponseEntity.status(HttpStatus.OK).body(new APIResponse(true, "INSTANCE_STOPPING", "Instance stopping"));
+        return ResponseEntity.status(HttpStatus.OK).body(new APIResponse(true, "INSTANCE_STOPPING", "Instance en cours d'arrêt"));
     }
 
     @GetMapping("/status")
