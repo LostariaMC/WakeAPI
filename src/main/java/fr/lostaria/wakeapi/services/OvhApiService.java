@@ -15,7 +15,7 @@ import java.io.IOException;
 public class OvhApiService {
 
     private final OvhApi ovhApi;
-    private final InstanceService instanceService;
+    private final SshService sshService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${ovh.serviceId}")
@@ -24,9 +24,9 @@ public class OvhApiService {
     @Value("${ovh.instanceId}")
     private String instanceId;
 
-    public OvhApiService(OvhApi ovhApi, InstanceService instanceService) {
+    public OvhApiService(OvhApi ovhApi, SshService sshService) {
         this.ovhApi = ovhApi;
-        this.instanceService = instanceService;
+        this.sshService = sshService;
     }
 
     public InstanceStatus getInstanceStatus() throws OvhApiException {
@@ -46,8 +46,10 @@ public class OvhApiService {
     }
 
     public void shelveInstance() throws OvhApiException, IOException {
-        instanceService.endProxy();
-        instanceService.clearBuildServerData();
+        sshService.execOrThrow(
+                "sudo -n systemctl stop mcproxy",
+                "rm -rf /srv/MinecraftServer/dev/special/Construction/*"
+        );
         ovhApi.post("/cloud/project/" + serviceId + "/instance/" + instanceId + "/shelve", "", true);
     }
 
