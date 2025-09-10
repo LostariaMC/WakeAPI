@@ -19,8 +19,8 @@ public class InstanceWatchService {
     private final MinecraftService minecraftService;
     private final OvhApiService ovhApiService;
 
-    private static final Duration INITIAL_DELAY = Duration.ofHours(1);
-    private static final Duration RECHECK_WHEN_PLAYERS = Duration.ofMinutes(30);
+    private static final Duration INITIAL_DELAY = Duration.ofMinutes(20);
+    private static final Duration RECHECK_WHEN_PLAYERS = Duration.ofMinutes(5);
     private static final Duration RECHECK_ON_ERROR = Duration.ofMinutes(5);
 
     private final AtomicReference<ScheduledFuture<?>> futureRef = new AtomicReference<>();
