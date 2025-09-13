@@ -6,17 +6,25 @@ This project requires the following to get started:
 - Java version `17` or higher
 - Maven version `3.9.11` or higher
 
-## Setup
+## Getting Started
+
+### Clone the repository
+```bash
+git clone https://github.com/LostariaMC/WakeAPI.git
+cd WakeAPI/
+```
+
+### Setup
 1. Go to `src/main/resources`
 2. Copy `application.properties.example` and rename it to `application.properties`
 3. Update the values in `application.properties` to match your environment
 
-## Compilation
+### Compilation
 ```bash
 mvn clean package
 ```
 
-## Running
+### Running
 ```bash
 java -jar target/WakeAPI-1.0-SNAPSHOT.jar
 ```
