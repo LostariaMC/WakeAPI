@@ -5,6 +5,7 @@ import fr.lostaria.wakeapi.core.exception.OvhApiException;
 import fr.lostaria.wakeapi.payload.APIResponse;
 import fr.lostaria.wakeapi.services.InstanceWatchService;
 import fr.lostaria.wakeapi.services.OvhApiService;
+import fr.lostaria.wakeapi.ws.InstanceStatusBroadcaster;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +21,12 @@ public class InstanceController {
 
     private OvhApiService ovhApiService;
     private final InstanceWatchService watchService;
+    private final InstanceStatusBroadcaster broadcaster;
 
-    public InstanceController(OvhApiService ovhApiService, InstanceWatchService watchService) {
+    public InstanceController(OvhApiService ovhApiService, InstanceWatchService watchService, InstanceStatusBroadcaster broadcaster) {
         this.ovhApiService = ovhApiService;
         this.watchService = watchService;
+        this.broadcaster = broadcaster;
     }
 
     @PostMapping("/start")
@@ -37,6 +40,7 @@ public class InstanceController {
         }
         ovhApiService.unshelveInstance();
         watchService.startWatchAfterOneHour();
+        broadcaster.broadcast(InstanceStatus.UNSHELVING);
         return ResponseEntity.status(HttpStatus.OK).body(new APIResponse(true, "INSTANCE_STARTING", "Instance en cours de démarrage"));
     }
 
@@ -50,6 +54,7 @@ public class InstanceController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(false, "INSTANCE_NOT_ACTIVE", "L'instance est déjà éteinte"));
         }
         ovhApiService.shelveInstance();
+        broadcaster.broadcast(InstanceStatus.SHELVING);
         return ResponseEntity.status(HttpStatus.OK).body(new APIResponse(true, "INSTANCE_STOPPING", "Instance en cours d'arrêt"));
     }
 

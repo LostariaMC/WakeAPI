@@ -1,5 +1,7 @@
 package fr.lostaria.wakeapi.services;
 
+import fr.lostaria.wakeapi.core.InstanceStatus;
+import fr.lostaria.wakeapi.ws.InstanceStatusBroadcaster;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
@@ -18,6 +20,7 @@ public class InstanceWatchService {
     private final TaskScheduler scheduler;
     private final MinecraftService minecraftService;
     private final OvhApiService ovhApiService;
+    private final InstanceStatusBroadcaster broadcaster;
 
     private static final Duration INITIAL_DELAY = Duration.ofMinutes(20);
     private static final Duration RECHECK_WHEN_PLAYERS = Duration.ofMinutes(5);
@@ -25,10 +28,11 @@ public class InstanceWatchService {
 
     private final AtomicReference<ScheduledFuture<?>> futureRef = new AtomicReference<>();
 
-    public InstanceWatchService(TaskScheduler scheduler, MinecraftService minecraftService, OvhApiService ovhApiService) {
+    public InstanceWatchService(TaskScheduler scheduler, MinecraftService minecraftService, OvhApiService ovhApiService, InstanceStatusBroadcaster broadcaster) {
         this.scheduler = scheduler;
         this.minecraftService = minecraftService;
         this.ovhApiService = ovhApiService;
+        this.broadcaster = broadcaster;
     }
 
     public void startWatchAfterOneHour() {
@@ -59,6 +63,7 @@ public class InstanceWatchService {
             if (!minecraftOnline) {
                 log.info("InstanceWatch: Minecraft OFFLINE — shelve de l’instance");
                 ovhApiService.shelveInstance();
+                broadcaster.broadcast(InstanceStatus.SHELVING);
                 cancel();
                 return;
             }
@@ -69,6 +74,7 @@ public class InstanceWatchService {
             if (players <= 0) {
                 log.info("InstanceWatch: 0 joueur — shelve de l’instance");
                 ovhApiService.shelveInstance();
+                broadcaster.broadcast(InstanceStatus.SHELVING);
                 cancel();
             } else {
                 log.info("InstanceWatch: {} joueur(s) — re-check dans {}", players, RECHECK_WHEN_PLAYERS);
